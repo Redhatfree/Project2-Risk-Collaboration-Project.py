@@ -1,0 +1,129 @@
+# -*- coding: utf-8 -*-
+"""
+Created on June 8, 2026
+
+@author: Rouzbeh
+Project 2: Unified Agile Sprint Velocity & Risk Analytics Suite
+"""
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+# ========================================================
+# 1. DATA LOADING & OPERATIONAL SPRINT INSIGHTS
+# ========================================================
+df = pd.read_csv(r"C:\Users\Rouzbeh\Desktop\python\sprint_data.csv")
+
+# Core Agile Metrics Calculations
+velocity = df[df["Status"] == "Done"]["Story_Points"].sum()
+backlog_points = df[df["Status"] != "Done"]["Story_Points"].sum()
+linda_load = df[df["Assignee"] == "Linda"]["Story_Points"].sum()
+
+# ========================================================
+# 2. FEATURE ENGINEERING & MULTI-LEVEL COMPLEXITY RISK ANALYSIS
+# ========================================================
+# Feature Engineering: 4 hours per point + random noise (-3 to +6 hours)
+df['Estimated_Hours'] = df['Story_Points'] * 4 + np.random.randint(-3, 7, size=len(df))
+
+# Descriptive Statistical Calculations
+mean_pts = df['Story_Points'].mean()
+std_pts = df['Story_Points'].std()
+variance = df['Story_Points'].var()
+limit = mean_pts + std_pts  # Statistical Risk Boundary
+
+# Flag tasks exceeding the limit as CRITICAL, else STABLE
+df['Risk_Level'] = ['CRITICAL' if x > limit else 'STABLE' for x in df['Story_Points']]
+
+# Level 1 Extraction: Top 3 heaviest tasks by weight
+top_weighted = df.sort_values(by='Story_Points', ascending=False).head(3)
+
+# Level 2 Extraction: Statistical Risk Outliers
+statistical_risk = df[df['Risk_Level'] == 'CRITICAL']
+
+# Level 3 Extraction: Model Reliability (Correlation)
+correlation = df['Story_Points'].corr(df['Estimated_Hours'])
+
+# ========================================================
+# 3. EXECUTIVE MANAGEMENT & DESCRIPTIVE REPORTING
+# ========================================================
+print("========================================================")
+print("          QUANTITATIVE SPRINT RISK & METRICS REPORT       ")
+print("========================================================")
+print(f"Current Team Velocity      : {velocity} Points") 
+print(f"Remaining Backlog Burden  : {backlog_points} Points")
+print(f"Linda's Resource Load      : {linda_load} Points")
+print("-" * 56)
+print(f"Gjennomsnittlig oppgavestørrelse : {mean_pts:.2f} poeng")
+print(f"Standardavvik (Usikkerhet)       : {std_pts:.2f}")
+print(f"Varians                          : {variance:.2f}")
+print(f"Statistical Risk Limit (Grense)  : {limit:.2f} poeng")
+print("========================================================\n")
+
+print(f"=== NIVÅ 1: TOPP 3 TYNGSTE OPPGAVER ===")
+print(top_weighted[['Task_Name', 'Story_Points']])
+
+print(f"\n=== NIVÅ 2: STATISTISK RISIKO (Outliers) ===")
+if not statistical_risk.empty:
+    print(statistical_risk[['Task_Name', 'Story_Points']])
+else:
+    print("Ingen oppgaver over grensen (Ingen ekstreme avvik funnet).")
+
+print(f"\n=== NIVÅ 3: MODELL-PÅLITELIGHET (KORRELASJON) ===")
+print(f"Korrelasjonskoeffisient: {correlation:.4f}")
+if correlation > 0.80:
+    print("Konklusjon: Modellen er stabil. Story Points forutsier timer godt. (GREEN)")
+elif correlation > 0.60:
+    print("Konklusjon: Moderat usikkerhet. Overvåk røde oppgaver nøye. (YELLOW)")
+else:
+    print("Konklusjon: Høy modell-usikkerhet. Skjult kompleksitet oppdaget. (RED)")
+print("========================================================\n")
+
+# ========================================================
+# 4. COLLABORATIVE ACTION-ITEM MATRIX LOG (NESTED DICTIONARY)
+# ========================================================
+print("="*56)
+print("     ENTERPRISE RISK COLLABORATION REGISTRY LOG")
+print("="*56)
+
+# This dictionary is our centralized collaboration database
+risk_register = {}
+
+for index, row in statistical_risk.iterrows():
+    # Build unique identifiers for our database keys
+    risk_id = f"RISK-{index+1:03d}"
+    
+    # Simple operational routing based on task size
+    if row['Story_Points'] > 8:
+        owner = "Sarah Jenkins (Senior Scrum Master)"
+    else:
+        owner = "Alex Rivera (Lead Developer)"
+        
+    # Store items into a nested database dictionary format
+    risk_register[risk_id] = {
+        "task_name": row['Task_Name'],
+        "assignee": row['Assignee'],
+        "story_points": row['Story_Points'],
+        "estimated_hours": row['Estimated_Hours'],
+        "owner": owner,
+        "history_log": []  # Empty tracking list where updates will be appended tomorrow
+    }
+    print(f"✔ Overført {risk_id} ('{row['Task_Name']}') til Active Risk Log. Eier: {owner}")
+
+print("-" * 56)
+print("FINAL COLLABORATIVE DATABASE STATE (risk_register):")
+print(risk_register)
+print("="*56)
+
+# ========================================================
+# 5. RISK PROFILE VISUALIZATION (SCATTER PLOT)
+# ========================================================
+plt.figure(figsize=(8, 5))
+plt.scatter(df['Story_Points'], df['Estimated_Hours'], color='blue', alpha=0.7, edgecolors='k', label='Tasks')
+plt.axvline(x=limit, color='red', linestyle='--', label=f'Risk Limit ({limit:.2f} Pts)')
+plt.title(f'Korrelasjonsanalyse & Statistisk Grense (r={correlation:.2f})')
+plt.xlabel('Story Points (Vekt)')
+plt.ylabel('Estimated Hours')
+plt.grid(True, linestyle=':', alpha=0.6)
+plt.legend()
+plt.tight_layout()
+plt.show()
