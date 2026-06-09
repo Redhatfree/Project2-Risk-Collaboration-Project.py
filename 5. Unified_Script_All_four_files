@@ -127,3 +127,53 @@ plt.grid(True, linestyle=':', alpha=0.6)
 plt.legend()
 plt.tight_layout()
 plt.show()
+# ========================================================
+# 6. INTERACTIVE TEAM COLLABORATION LOG TERMINAL
+# ========================================================
+print("\n" + "="*56)
+print("     ENTERPRISE RISK MANAGEMENT INTERACTIVE CONSOLE")
+print("========================================================")
+print("Welcome to the live Risk Collaboration Shell.")
+print("Type 'exit' at any prompt to terminate the session.")
+print("-" * 56)
+
+while True:
+    # Prompt the user to select a risk to manage
+    target_id = input("\nEnter Risk ID to update (e.g., RISK-001) or 'exit': ").strip().upper()
+    
+    # Graceful exit pathway
+    if target_id == 'EXIT':
+        print("\nExiting Risk Management Console. Session logged successfully.")
+        break
+        
+    # Validation Gate: Check if the entered ID exists in our nested dictionary keys
+    if target_id not in risk_register:
+        print(f"❌ ERROR: ID '{target_id}' not found in active database. Please try again.")
+        continue  # Restart the loop to prompt the user again without crashing
+        
+    # If valid, retrieve the current risk profile
+    profile = risk_register[target_id]
+    print(f"\n--- ACTIVE PROFILE FOR {target_id} ---")
+    print(f"Task Name   : {profile['task_name']}")
+    print(f"Assignee    : {profile['assignee']}")
+    print(f"Risk Owner  : {profile['owner']}")
+    print(f"Complexity  : {profile['story_points']} Story Points")
+    print(f"Current Logs: {profile['history_log'] if profile['history_log'] else '[No historical updates entered yet]'}")
+    print("-" * 40)
+    
+    # Prompt the user to input a collaborative update note
+    new_update = input(f"Enter team update note for {target_id}: ").strip()
+    
+    if not new_update:
+        print("⚠ Update cancelled: Note cannot be blank.")
+        continue
+        
+    # Append the fresh update string directly into the nested list inside our dictionary
+    profile['history_log'].append(new_update)
+    print(f"✔ Collaboration log successfully pushed to {target_id}!")
+
+# Print final confirmation of the database state before closing down
+print("\n" + "="*56)
+print("FINAL COLLABORATION DATABASE ARCHIVE STATE:")
+print(risk_register)
+print("========================================================")
