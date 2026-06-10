@@ -128,6 +128,47 @@ plt.legend()
 plt.tight_layout()
 plt.show()
 # ========================================================
+
+print("\n" + "="*56)
+print("     ENTERPRISE RISK MANAGEMENT INTERACTIVE CONSOLE")
+print("========================================================")
+print("Welcome to the live Risk Collaboration Shell.")
+print("Type 'exit' at any prompt to terminate the session.")
+print("-" * 56)
+
+while True:
+    target_id = input("\nEnter Risk ID to update (e.g., RISK-001) or 'exit': ").strip().upper()
+    
+    if target_id == 'EXIT':
+        print("\nExiting Risk Management Console. Session logged successfully.")
+        break
+        
+    if target_id not in risk_register:
+        print(f"❌ ERROR: ID '{target_id}' not found in active database. Please try again.")
+        continue  
+        
+    profile = risk_register[target_id]
+    print(f"\n--- ACTIVE PROFILE FOR {target_id} ---")
+    print(f"Task Name   : {profile['task_name']}")
+    print(f"Assignee    : {profile['assignee']}")
+    print(f"Risk Owner  : {profile['owner']}")
+    print(f"Complexity  : {profile['story_points']} Story Points")
+    print(f"Current Logs: {profile['history_log'] if profile['history_log'] else '[No historical updates entered yet]'}")
+    print("-" * 40)
+    
+    new_update = input(f"Enter team update note for {target_id}: ").strip()
+    
+    if not new_update:
+        print("⚠ Update cancelled: Note cannot be blank.")
+        continue
+        
+    profile['history_log'].append(new_update)
+    print(f"✔ Collaboration log successfully pushed to {target_id}!")
+
+print("\n" + "="*56)
+print("FINAL COLLABORATION DATABASE ARCHIVE STATE:")
+print(risk_register)
+print("========================================================")
 # 6. INTERACTIVE TEAM COLLABORATION LOG TERMINAL
 # ========================================================
 print("\n" + "="*56)
