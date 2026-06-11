@@ -142,7 +142,7 @@ while True:
     # UPGRADED EXIT GATEWAY WITH PERSISTENCE (Saves your work!)
     if target_id == 'EXIT':
         print("\n" + "="*56)
-        print("💾 INITIALIZING DATA ARCHIVAL GATEWAY...")
+        print(" INITIALIZING DATA ARCHIVAL GATEWAY...")
         print("="*56)
         
         output_file_path = r"C:\Users\Rouzbeh\Desktop\python\final_risk_matrix_snapshot.json"
@@ -151,7 +151,7 @@ while True:
             with open(output_file_path, 'w', encoding='utf-8') as json_file:
                 json.dump(risk_register, json_file, indent=4, ensure_ascii=False)
             print(f"✔ SUCCESS: Live session database written to disk!")
-            print(f"📁 Target Destination: {output_file_path}")
+            print(f" Target Destination: {output_file_path}")
         except Exception as e:
             print(f"❌ ARCHIVE ERROR: Could not save database. Reason: {e}")
             
