@@ -160,6 +160,9 @@ plt.legend()
 plt.tight_layout()
 plt.show()
 # ========================================================
+# ========================================================
+# 6. INTERACTIVE CONSOLE & DATA ARCHIVAL GATEWAY (WITH BACKUP)
+# ========================================================
 print("\n" + "="*56)
 print("     ENTERPRISE RISK MANAGEMENT INTERACTIVE CONSOLE")
 print("========================================================")
@@ -168,32 +171,45 @@ print("Type 'exit' at any prompt to terminate the session.")
 print("-" * 56)
 
 while True:
+    # 1. Prompt user for target ID, strip spaces, and normalize to uppercase
     target_id = input("\nEnter Risk ID to update (e.g., RISK-001) or 'exit': ").strip().upper()
     
-    # UPGRADED EXIT GATEWAY WITH PERSISTENCE (Saves your work!)
+    # --- THE ARCHIVAL EXIT GATEWAY ---
     if target_id == 'EXIT':
         print("\n" + "="*56)
-        print(" INITIALIZING DATA ARCHIVAL GATEWAY...")
+        print("💾 INITIALIZING DATA ARCHIVAL GATEWAY...")
         print("="*56)
         
         output_file_path = r"C:\Users\Rouzbeh\Desktop\python\final_risk_matrix_snapshot.json"
+        backup_file_path = r"C:\Users\Rouzbeh\Desktop\python\final_risk_matrix_snapshot.bak"
         
+        # PRO TASK: Create a backup clone of the last stable file before overwriting it
+        if os.path.exists(output_file_path):
+            try:
+                shutil.copy(output_file_path, backup_file_path)
+                print("✔ BACKUP ROTATION: Saved previous session state to (.bak) snapshot.")
+            except Exception as backup_error:
+                print(f"⚠ WARNING: Could not create backup snapshot: {backup_error}")
+
+        # Save the current live dictionary to your main JSON file
         try:
             with open(output_file_path, 'w', encoding='utf-8') as json_file:
                 json.dump(risk_register, json_file, indent=4, ensure_ascii=False)
             print(f"✔ SUCCESS: Live session database written to disk!")
-            print(f" Target Destination: {output_file_path}")
+            print(f"📁 Target Destination: {output_file_path}")
         except Exception as e:
-            print(f" ARCHIVE ERROR: Could not save database. Reason: {e}")
+            print(f"❌ ARCHIVE ERROR: Could not save database. Reason: {e}")
             
         print("\nExiting Risk Management Console. Session logged safely.")
         print("="*56)
-        break  
+        break  # Safely terminate the infinite loop and end the program
         
+    # --- THE VALIDATION GUARD CLAUSE ---
     if target_id not in risk_register:
-        print(f" ERROR: ID '{target_id}' not found in active database. Please try again.")
-        continue  
+        print(f"❌ ERROR: ID '{target_id}' not found in active database. Please try again.")
+        continue  # Skip the lines below and jump back to the input prompt
         
+    # --- DISPLAY PROFILE ---
     profile = risk_register[target_id]
     print(f"\n--- ACTIVE PROFILE FOR {target_id} ---")
     print(f"Task Name   : {profile['task_name']}")
@@ -203,13 +219,14 @@ while True:
     print(f"Current Logs: {profile['history_log'] if profile['history_log'] else '[No historical updates entered yet]'}")
     print("-" * 40)
     
+    # --- MUTATE DATABASE LOG ---
     new_update = input(f"Enter team update note for {target_id}: ").strip()
     
     if not new_update:
         print("⚠ Update cancelled: Note cannot be blank.")
         continue
         
+    # Append note directly into the memory stream reference
     profile['history_log'].append(new_update)
     print(f"✔ Collaboration log successfully pushed to {target_id}!")
-
 
