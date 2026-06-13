@@ -81,40 +81,57 @@ else:
 print("========================================================\n")
 
 # ========================================================
-# 4. COLLABORATIVE ACTION-ITEM MATRIX LOG (NESTED DICTIONARY)
+# 4. COLLABORATIVE ACTION-ITEM MATRIX LOG (UPGRADED PERSISTENCE)
 # ========================================================
 print("="*56)
 print("     ENTERPRISE RISK COLLABORATION REGISTRY LOG")
 print("="*56)
 
-# This dictionary is our centralized collaboration database
-risk_register = {}
+# Define the permanent file destination path
+output_file_path = r"C:\Users\Rouzbeh\Desktop\python\final_risk_matrix_snapshot.json"
 
-for index, row in statistical_risk.iterrows():
-    # Build unique identifiers for our database keys
-    risk_id = f"RISK-{index+1:03d}"
+# --- THE SMART UPDATE STARTS HERE ---
+# Check if a saved session database already exists on the hard drive
+if os.path.exists(output_file_path):
+    print("DETECTED EXISTING DATABASE SNAPSHOT! Booting persistence engine...")
+    try:
+        with open(output_file_path, 'r', encoding='utf-8') as json_file:
+            # json.load() reads the file back into a live Python dictionary
+            risk_register = json.load(json_file)
+        print(f"✔ SUCCESS: Restored active records from: {output_file_path}")
+    except Exception as e:
+        print(f" BOOT ERROR: Could not read JSON backup. Reason: {e}")
+        print("Falling back to generating a fresh baseline dictionary...")
+        risk_register = {}
+else:
+    # COLD START: If no file exists, build it freshly from the Pandas DataFrame rows
+    print(" No historical database found. Initializing baseline from DataFrame...")
+    risk_register = {}
     
-    # Simple operational routing based on task size
-    if row['Story_Points'] > 8:
-        owner = "Sarah Jenkins (Senior Scrum Master)"
-    else:
-        owner = "Alex Rivera (Lead Developer)"
+    # We only care about tasks flagged as CRITICAL earlier in Section 2
+    for index, row in statistical_risk.iterrows():
+        risk_id = f"RISK-{index+1:03d}"
         
-    # Store items into a nested database dictionary format
-    risk_register[risk_id] = {
-        "task_name": row['Task_Name'],
-        "assignee": row['Assignee'],
-        "story_points": row['Story_Points'],
-        "estimated_hours": row['Estimated_Hours'],
-        "owner": owner,
-        "history_log": []  # Empty tracking list where updates will be appended tomorrow
-    }
-    print(f"✔ Overført {risk_id} ('{row['Task_Name']}') til Active Risk Log. Eier: {owner}")
+        if row['Story_Points'] > 8:
+            owner = "Sarah Jenkins (Senior Scrum Master)"
+        else:
+            owner = "Alex Rivera (Lead Developer)"
+            
+        risk_register[risk_id] = {
+            "task_name": row['Task_Name'],
+            "assignee": row['Assignee'],
+            "story_points": row['Story_Points'],
+            "estimated_hours": row['Estimated_Hours'],
+            "owner": owner,
+            "history_log": []  
+        }
+        print(f"✔ Transferred {risk_id} ('{row['Task_Name']}') to Active Risk Log.")
 
 print("-" * 56)
-print("FINAL COLLABORATIVE DATABASE STATE (risk_register):")
+print("CURRENT DATABASE MEMORY STATE (Ready for Console Interaction):")
 print(risk_register)
 print("="*56)
+# --- THE SMART UPDATE ENDS HERE ---
 
 # ========================================================
 # 5. RISK PROFILE VISUALIZATION (SCATTER PLOT)
@@ -154,14 +171,14 @@ while True:
             print(f"✔ SUCCESS: Live session database written to disk!")
             print(f" Target Destination: {output_file_path}")
         except Exception as e:
-            print(f"❌ ARCHIVE ERROR: Could not save database. Reason: {e}")
+            print(f" ARCHIVE ERROR: Could not save database. Reason: {e}")
             
         print("\nExiting Risk Management Console. Session logged safely.")
         print("="*56)
         break  
         
     if target_id not in risk_register:
-        print(f"❌ ERROR: ID '{target_id}' not found in active database. Please try again.")
+        print(f" ERROR: ID '{target_id}' not found in active database. Please try again.")
         continue  
         
     profile = risk_register[target_id]
