@@ -90,6 +90,7 @@ print("="*56)
 
 # Define the permanent file destination path
 output_file_path = r"C:\Users\Rouzbeh\Desktop\python\final_risk_matrix_snapshot.json"
+backup_file_path = r"C:\Users\Rouzbeh\Desktop\python\final_risk_matrix_snapshot.bak"
 
 # --- THE SMART UPDATE STARTS HERE ---
 # Check if a saved session database already exists on the hard drive
