@@ -95,16 +95,27 @@ backup_file_path = r"C:\Users\Rouzbeh\Desktop\python\final_risk_matrix_snapshot.
 # --- THE SMART UPDATE STARTS HERE ---
 # Check if a saved session database already exists on the hard drive
 if os.path.exists(output_file_path):
-    print("DETECTED EXISTING DATABASE SNAPSHOT! Booting persistence engine...")
+    print(" DETECTED EXISTING DATABASE SNAPSHOT! Reading data...")
     try:
         with open(output_file_path, 'r', encoding='utf-8') as json_file:
-            # json.load() reads the file back into a live Python dictionary
             risk_register = json.load(json_file)
-        print(f"✔ SUCCESS: Restored active records from: {output_file_path}")
-    except Exception as e:
-        print(f" BOOT ERROR: Could not read JSON backup. Reason: {e}")
-        print("Falling back to generating a fresh baseline dictionary...")
-        risk_register = {}
+        print("✔ SUCCESS: Restored active records from primary JSON.")
+    except (json.JSONDecodeError, Exception) as e:
+        print(f"⚠ CRITICAL CORRUPTION: Primary file corrupted. Reason: {e}")
+        
+        # FAILOVER SYSTEM: Try to load from backup file
+        if os.path.exists(backup_file_path):
+            print(" RESTORING FROM BACKUP FILE (.bak)...")
+            try:
+                with open(backup_file_path, 'r', encoding='utf-8') as bak_file:
+                    risk_register = json.load(bak_file)
+                print("✔ RECOVERY SUCCESSFUL: Restored records from stable backup snapshot!")
+            except Exception as backup_err:
+                print(f" FAILOVER FAILED: Backup file also unreadable. Reason: {backup_err}")
+                risk_register = {}
+        else:
+            print(" FAILOVER FAILED: No backup file (.bak) found on disk. Initializing blank register.")
+            risk_register = {}
 else:
     # COLD START: If no file exists, build it freshly from the Pandas DataFrame rows
     print(" No historical database found. Initializing baseline from DataFrame...")
