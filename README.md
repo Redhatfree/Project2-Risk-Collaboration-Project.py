@@ -14,6 +14,13 @@ This section analyses the correlation between resource usage and complexity.
 4. Predicative Risk dashboard:
 This dashboard define tasks with Critical or Stable condition for risk.
 
+# Project 2: Unified Agile Sprint Velocity & Risk Analytics Suite
 
+An enterprise-grade Python tool for agile metrics analysis and predictive risk management.
+
+## Key Features
+- **Data Analytics:** Filters and analyzes sprint data using Pandas.
+- **Statistical Guardrails:** Detects critical task anomalies using Standard Deviation.
+- **Resilient Persistence:** Saves/loads user updates via interactive JSON with an automated `shutil` backup failover mechanism.
 
 
