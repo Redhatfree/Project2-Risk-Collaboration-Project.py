@@ -22,6 +22,7 @@ velocity = df[df["Status"] == "Done"]["Story_Points"].sum()
 backlog_points = df[df["Status"] != "Done"]["Story_Points"].sum()
 linda_load = df[df["Assignee"] == "Linda"]["Story_Points"].sum()
 
+
 # ========================================================
 # 2. FEATURE ENGINEERING & MULTI-LEVEL COMPLEXITY RISK ANALYSIS
 # ========================================================
